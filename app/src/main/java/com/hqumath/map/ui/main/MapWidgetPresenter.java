@@ -3,7 +3,6 @@ package com.hqumath.map.ui.main;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
@@ -11,6 +10,7 @@ import android.graphics.drawable.Drawable;
 
 import com.hqumath.map.R;
 import com.hqumath.map.app.Constants;
+import com.hqumath.map.bean.Waypoints;
 import com.hqumath.map.utils.CommonUtil;
 
 import org.osmdroid.api.IMapController;
@@ -25,7 +25,6 @@ import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.OverlayItem;
-import org.osmdroid.views.overlay.Polygon;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.TilesOverlay;
 
@@ -46,10 +45,7 @@ public class MapWidgetPresenter {
     private IMapController mapController;
     private MapView mapView;
     private Polyline line;//航线
-    private Polygon polygon;//围栏
-
     private ItemizedIconOverlay itemizedIconOverlay;//航点
-    private Marker myLocation;//当前位置
     private Marker myLocation2;//当前位置2
 
     public MapWidgetPresenter(MapView mapView) {
@@ -77,12 +73,9 @@ public class MapWidgetPresenter {
         mapView.getOverlayManager().add(tilesOverlay);
         //添加航线
         addLines();
-        //添加围栏
-        //addPolygon();
         //添加航点
         addPoints();
         //添加标记
-        initMarker();
         initMarker2();
 
         //缺省的位置
@@ -131,7 +124,7 @@ public class MapWidgetPresenter {
     }
 
     public void setCenter(double lat, double lng, float rotate) {
-        updateMarker(lat, lng, rotate);
+        //updateMarker(lat, lng, rotate);
         mapController.setCenter(new GeoPoint(lat, lng));
         //mapController.animateTo(new GeoPoint(lat, lng));
     }
@@ -156,13 +149,13 @@ public class MapWidgetPresenter {
     }
 
     //更新航线
-//    public void updateLines() {
-//        List<GeoPoint> points = new ArrayList<>();
-//        for (WayPointInfo.WaypointDTO waypoint : Constants.waypoints) {
-//            points.add(new GeoPoint(waypoint.getCoordinate().get(1), waypoint.getCoordinate().get(0)));
-//        }
-//        line.setPoints(points);
-//    }
+    public void updateLines(List<Waypoints.WaypointDTO> waypoints) {
+        List<GeoPoint> points = new ArrayList<>();
+        for (Waypoints.WaypointDTO waypoint : waypoints) {
+            points.add(new GeoPoint(waypoint.getCoordinate().get(1), waypoint.getCoordinate().get(0)));
+        }
+        line.setPoints(points);
+    }
 
     //添加航点
     public void addPoints() {
@@ -182,103 +175,17 @@ public class MapWidgetPresenter {
     }
 
     //更新航点
-//    public void updatePoints() {
-//        ArrayList<OverlayItem> items = new ArrayList<>();
-//        for (WayPointInfo.WaypointDTO waypoint : Constants.waypoints) {
-//            OverlayItem item = new OverlayItem("", "", new GeoPoint(waypoint.getCoordinate().get(1), waypoint.getCoordinate().get(0)));
-//            Drawable marker = textToDrawable(items.size() + 1 + "");//01H 20km/h
-//            //Drawable marker = CommonUtil.getContext().getResources().getDrawable(R.drawable.icon_marker);
-//            item.setMarker(marker);
-//            items.add(item);
-//        }
-//        itemizedIconOverlay.removeAllItems();
-//        itemizedIconOverlay.addItems(items);
-//    }
-
-    //添加围栏
-    public void addPolygon() {
-        polygon = new Polygon();
-        polygon.getFillPaint().setColor(0x30FFFF00);
-        polygon.getOutlinePaint().setStrokeWidth(0);
-        //polygon.setStrokeWidth(1);
-        //polygon.setFillColor(0x8032B5EB);
-        //polygon.setStrokeColor(Color.BLUE);
-        //polygon.setPoints(points);
-        mapView.getOverlays().add(polygon);
-    }
-
-    //更新围栏
-//    public void updatePolygon() {
-//        List<GeoPoint> flyWayInfo = new ArrayList<>();//无人机航线
-//        for (WayPointInfo.WaypointDTO waypoint : Constants.waypoints) {
-//            flyWayInfo.add(new GeoPoint(waypoint.getCoordinate().get(1), waypoint.getCoordinate().get(0)));
-//        }
-//        List<GeoPoint> flyWayInfoInRight = new ArrayList<>();//无人机航线右侧边缘
-//        List<GeoPoint> flyWayInfoInLeft = new ArrayList<>();//无人机航线左侧边缘
-//        if (flyWayInfo.size() < 3)
-//            return;
-//        for (int i = 1; i < flyWayInfo.size() - 2; i++) {
-//            GeoPoint waypointCurrent = flyWayInfo.get(i);//当前航点
-//            GeoPoint waypointNext = flyWayInfo.get(i + 1);//下个航点
-//            GeoPoint waypointMiddle = new GeoPoint((waypointCurrent.getLatitude() + waypointNext.getLatitude()) / 2, (waypointCurrent.getLongitude() + waypointNext.getLongitude()) / 2);//中间点
-//            float fenceInHor = (Constants.waypoints.get(i).getFenceInHor() + Constants.waypoints.get(i + 1).getFenceInHor()) / 2;//中间点-内层围栏水平距离
-//
-//            //从当前航点到下一航点的方位角 弧度值∈[-pi,pi]
-//            double degreeLine = LocationUtil.getAzimuth(waypointCurrent.getLatitude(), waypointCurrent.getLongitude(), waypointNext.getLatitude(), waypointNext.getLongitude());
-//            double northDistance = fenceInHor * Math.sin(degreeLine);//北向距离
-//            double eastDistance = fenceInHor * Math.cos(degreeLine);//东向距离
-//            double latitudeRight = waypointMiddle.getLatitude() - northDistance / LocationUtil.PerLatDistance;//右侧边缘点纬度
-//            double latitudeLeft = waypointMiddle.getLatitude() + northDistance / LocationUtil.PerLatDistance;//左侧边缘点纬度
-//            double longitudeRight = waypointMiddle.getLongitude() + eastDistance / LocationUtil.PerLatDistance / Math.cos(Math.toRadians(latitudeRight));//右侧边缘点经度
-//            double longitudeLeft = waypointMiddle.getLongitude() - eastDistance / LocationUtil.PerLatDistance / Math.cos(Math.toRadians(latitudeLeft));//左侧边缘点经度
-//            flyWayInfoInRight.add(new GeoPoint(latitudeRight, longitudeRight));
-//            flyWayInfoInLeft.add(new GeoPoint(latitudeLeft, longitudeLeft));
-//        }
-//        /*//添加航线右侧边缘
-//        activity.hMap.addPolyline(new PolylineOptions().addAll(flyWayInfoInRight)
-//                .color(Color.GREEN)//折线颜色
-//                .width(2));//折线宽度
-//        //添加航线左侧边缘
-//        activity.hMap.addPolyline(new PolylineOptions().addAll(flyWayInfoInLeft)
-//                .color(Color.BLUE)//折线颜色
-//                .width(2));//折线宽度*/
-//        //添加内层围栏
-//        List<GeoPoint> flyWayInfoIn = new ArrayList<>();
-//        flyWayInfoIn.add(flyWayInfo.get(0));//第一个航点
-//        flyWayInfoIn.addAll(flyWayInfoInRight);//航线右侧边缘
-//        flyWayInfoIn.add(flyWayInfo.get(flyWayInfo.size() - 1));//最后一个航点
-//        for (int i = flyWayInfoInLeft.size() - 1; i >= 0; i--) {//航线左侧边缘，逆序
-//            flyWayInfoIn.add(flyWayInfoInLeft.get(i));
-//        }
-//        polygon.setPoints(flyWayInfoIn);
-//    }
-
-    //添加标记
-    private void initMarker() {
-        myLocation = new Marker(mapView);
-        //startMarker.setPosition(startPoint);
-        myLocation.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER);
-        //startMarker.setIcon(drawable);
-        myLocation.setInfoWindow(null);
-        mapView.getOverlays().add(myLocation);
-    }
-
-    /**
-     * 更新标记
-     * @param lat 坐标
-     * @param lng
-     * @param degrees 旋转角度
-     */
-    public void updateMarker(double lat, double lng, float degrees) {
-        GeoPoint startPoint = new GeoPoint(lat, lng);
-        myLocation.setPosition(startPoint);
-        Drawable drawable = CommonUtil.getContext().getResources().getDrawable(R.drawable.location_mark2);
-        Bitmap bitmap = ((BitmapDrawable) drawable).getBitmap();
-        Matrix matrix = new Matrix();
-        matrix.setRotate(degrees);
-        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-        Drawable newDrawable = new BitmapDrawable(bitmap);
-        myLocation.setIcon(newDrawable);
+    public void updatePoints(List<Waypoints.WaypointDTO> waypoints) {
+        ArrayList<OverlayItem> items = new ArrayList<>();
+        for (Waypoints.WaypointDTO waypoint : waypoints) {
+            OverlayItem item = new OverlayItem("", "", new GeoPoint(waypoint.getCoordinate().get(1), waypoint.getCoordinate().get(0)));
+            Drawable marker = textToDrawable(items.size() + 1 + "");//01H 20km/h
+            //Drawable marker = CommonUtil.getContext().getResources().getDrawable(R.drawable.icon_marker);
+            item.setMarker(marker);
+            items.add(item);
+        }
+        itemizedIconOverlay.removeAllItems();
+        itemizedIconOverlay.addItems(items);
     }
 
     //添加标记
@@ -294,6 +201,7 @@ public class MapWidgetPresenter {
 
     /**
      * 更新标记
+     *
      * @param lat 坐标
      * @param lng
      */

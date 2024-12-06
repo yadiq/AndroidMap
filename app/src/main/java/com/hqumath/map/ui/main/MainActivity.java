@@ -3,7 +3,10 @@ package com.hqumath.map.ui.main;
 import android.os.Bundle;
 import android.view.View;
 
+import com.google.gson.Gson;
+import com.hqumath.map.app.Constants;
 import com.hqumath.map.base.BaseActivity;
+import com.hqumath.map.bean.Waypoints;
 import com.hqumath.map.databinding.ActivityMainBinding;
 
 import org.osmdroid.events.MapEventsReceiver;
@@ -66,6 +69,8 @@ public class MainActivity extends BaseActivity {
                 return false;
             }
         });
+
+
     }
 
     @Override
@@ -80,5 +85,19 @@ public class MainActivity extends BaseActivity {
         super.onPause();
         if (mapPresenter != null)
             mapPresenter.onPause();
+    }
+
+    /**
+     * 更新地图
+     */
+    public void updateMap() {
+        Waypoints waypoints = new Gson().fromJson(Constants.waypoints, Waypoints.class);
+        mapPresenter.updateLines(waypoints.getWaypoint());//添加航线
+        mapPresenter.updatePoints(waypoints.getWaypoint());//添加航点
+//        //更新中心位置
+//        if (Constants.waypoints.size() > 0) {
+//            WayPointInfo.WaypointDTO waypoint = Constants.waypoints.get(0);
+//            mapPresenter.setCenter(waypoint.getCoordinate().get(1), waypoint.getCoordinate().get(0));
+//        }
     }
 }
