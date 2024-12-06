@@ -46,22 +46,15 @@ public class MainActivity extends BaseActivity {
         mapPresenter.init(new MapEventsReceiver() {
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p) {
-//                if (binding.cbMapPoint.isChecked()) {
-//                    double lat = p.getLatitude();
-//                    double lng = p.getLongitude();
-//                    double alt = 150;
-//                    /*if (BuildConfig.DEBUG) {
-//                        lat = 36.44353842;
-//                        lng = 117.17613932;
-//                        alt = 246.3;
-//                    }*/
-//                    mapPresenter.updateMarker2(lat, lng);
-//                    mapPresenter.refresh();
-//                    mqttClient.sendDataCommand("aircraft_follow_gps", lat, lng, alt);
-//                    return false;
-//                }
-//                binding.cvMap.performClick();//切换地图
-                return false;
+                double lat = p.getLatitude();
+                double lng = p.getLongitude();
+                mapPresenter.updateMarker2(lat, lng);
+                mapPresenter.refresh();
+                StringBuilder sb = new StringBuilder("点击位置(WGS84坐标系):\n");
+                sb.append("经度: ").append(lng).append("\n");
+                sb.append("纬度: ").append(lat).append("");
+                binding.tvLocation.setText(sb);
+                return true;
             }
 
             @Override
@@ -69,8 +62,7 @@ public class MainActivity extends BaseActivity {
                 return false;
             }
         });
-
-
+        updateMap();
     }
 
     @Override
@@ -94,10 +86,10 @@ public class MainActivity extends BaseActivity {
         Waypoints waypoints = new Gson().fromJson(Constants.waypoints, Waypoints.class);
         mapPresenter.updateLines(waypoints.getWaypoint());//添加航线
         mapPresenter.updatePoints(waypoints.getWaypoint());//添加航点
-//        //更新中心位置
-//        if (Constants.waypoints.size() > 0) {
-//            WayPointInfo.WaypointDTO waypoint = Constants.waypoints.get(0);
-//            mapPresenter.setCenter(waypoint.getCoordinate().get(1), waypoint.getCoordinate().get(0));
-//        }
+        //更新中心位置
+        if (!waypoints.getWaypoint().isEmpty()) {
+            Waypoints.WaypointDTO waypoint = waypoints.getWaypoint().get(0);
+            mapPresenter.setCenter(waypoint.getCoordinate().get(1), waypoint.getCoordinate().get(0));
+        }
     }
 }
