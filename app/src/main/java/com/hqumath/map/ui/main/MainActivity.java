@@ -1,12 +1,13 @@
 package com.hqumath.map.ui.main;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
 import com.hqumath.map.base.BaseActivity;
 import com.hqumath.map.databinding.ActivityMainBinding;
-import com.hqumath.map.ui.repos.MyReposActivity;
+
+import org.osmdroid.events.MapEventsReceiver;
+import org.osmdroid.util.GeoPoint;
 
 /**
  * ****************************************************************
@@ -18,6 +19,7 @@ import com.hqumath.map.ui.repos.MyReposActivity;
  */
 public class MainActivity extends BaseActivity {
     private ActivityMainBinding binding;
+    private MapWidgetPresenter mapPresenter;
 
     @Override
     protected View initContentView(Bundle savedInstanceState) {
@@ -27,12 +29,56 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initListener() {
-        binding.btnMyRepos.setOnClickListener(v -> {
-            startActivity(new Intent(mContext, MyReposActivity.class));
+        binding.ivZoomIn.setOnClickListener(v -> {
+            mapPresenter.zoomIn();
+        });
+        binding.ivZoomOut.setOnClickListener(v -> {
+            mapPresenter.zoomOut();
         });
     }
 
     @Override
     protected void initData() {
+        mapPresenter = new MapWidgetPresenter(binding.mapView);
+        mapPresenter.init(new MapEventsReceiver() {
+            @Override
+            public boolean singleTapConfirmedHelper(GeoPoint p) {
+//                if (binding.cbMapPoint.isChecked()) {
+//                    double lat = p.getLatitude();
+//                    double lng = p.getLongitude();
+//                    double alt = 150;
+//                    /*if (BuildConfig.DEBUG) {
+//                        lat = 36.44353842;
+//                        lng = 117.17613932;
+//                        alt = 246.3;
+//                    }*/
+//                    mapPresenter.updateMarker2(lat, lng);
+//                    mapPresenter.refresh();
+//                    mqttClient.sendDataCommand("aircraft_follow_gps", lat, lng, alt);
+//                    return false;
+//                }
+//                binding.cvMap.performClick();//切换地图
+                return false;
+            }
+
+            @Override
+            public boolean longPressHelper(GeoPoint p) {
+                return false;
+            }
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mapPresenter != null)
+            mapPresenter.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mapPresenter != null)
+            mapPresenter.onPause();
     }
 }
