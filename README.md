@@ -1,7 +1,13 @@
 # AndroidMapDemo
 Android开源地图方案，天地图+osmdroid
+详见blog: https://yadiq.github.io/2023/08/22/AndroidMap/
 
 ## 功能
-1. 地图图层显示，天地图影像底图+影像注记
-2. 地图上绘制绘制点、线、文字
-3. 显示点击位置的经纬度
++ 添加两个图层，影像底图和影像注记。
++ 添加缩放按钮，支持缩放手势。
++ 支持点击事件。
++ 绘制航线、航点、标记。
+
+## 效果图
+
+![AndroidMap](./img/AndroidMap1.jpg)

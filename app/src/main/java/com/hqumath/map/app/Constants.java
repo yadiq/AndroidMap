@@ -23,10 +23,10 @@ public class Constants {
     //天地图key http://lbs.tianditu.gov.cn/
     public final static String TDT_KEY = "f0208c6587580095818c28b4ec698950"; //天地图key 私人账号，会限制流量，请替换为自己的key
     public final static String tileSourceImgUrl = baseUrl_TDT
-            + "img_w/wmts?img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&tk="
+            + "img_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=img&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&tk="
             + TDT_KEY;//天地图 影像底图 球面墨卡托投影
     public final static String tileSourceCiaUrl = baseUrl_TDT
-            + "cia_w/wmts?cia_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cia&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&tk="
+            + "cia_w/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=cia&STYLE=default&TILEMATRIXSET=w&FORMAT=tiles&tk="
             + TDT_KEY;//天地图 影像注记 球面墨卡托投影
     public final static int zoomMinLevel = 1;//缩放级别，显示最大区域
     public final static int zoomMaxLevel = 18;
